@@ -7,6 +7,7 @@
  *
  */
 
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <queue>
@@ -14,7 +15,7 @@
 #include <string>
 #include <unordered_set>
 
-std::string kYourName = "STUDENT TODO"; // Don't forget to change this!
+std::string kYourName = "Benhao Qu"; // Don't forget to change this!
 
 /**
  * Takes in a file name and returns a set containing all of the applicant names as a set.
@@ -27,8 +28,17 @@ std::string kYourName = "STUDENT TODO"; // Don't forget to change this!
  * below it) to use a `std::unordered_set` instead. If you do so, make sure
  * to also change the corresponding functions in `utils.h`.
  */
-std::set<std::string> get_applicants(std::string filename) {
+std::unordered_set<std::string> get_applicants(std::string filename) {
   // STUDENT TODO: Implement this function.
+  std::unordered_set<std::string> applicants;
+  std::ifstream file(filename);
+  std::string name;
+  while (std::getline(file, name)) {
+    if (!name.empty()) {
+      applicants.insert(name);
+    }
+  }
+  return applicants;
 }
 
 /**
@@ -39,8 +49,21 @@ std::set<std::string> get_applicants(std::string filename) {
  * @param students  The set of student names.
  * @return          A queue containing pointers to each matching name.
  */
-std::queue<const std::string*> find_matches(std::string name, std::set<std::string>& students) {
+std::queue<const std::string*> find_matches(std::string name, std::unordered_set<std::string>& students) {
   // STUDENT TODO: Implement this function.
+  std::queue<const std::string*> matches;
+  size_t name_pos = name.find(' ');
+  std::string name_initials = name.substr(0, 1) + name.substr(name_pos + 1, 1);
+  for (auto & student : students) {
+    size_t pos = student.find(' ');
+    if (pos != std::string::npos) {
+      std::string student_initials = student.substr(0, 1) + student.substr(student.find(' ') + 1, 1);
+      if (name_initials == student_initials) {
+        matches.push(&student);
+      }
+    }
+  }
+  return matches;
 }
 
 /**
@@ -55,6 +78,17 @@ std::queue<const std::string*> find_matches(std::string name, std::set<std::stri
  */
 std::string get_match(std::queue<const std::string*>& matches) {
   // STUDENT TODO: Implement this function.
+  if (matches.empty()) {
+    return "NO MATCHES FOUND.";
+  }
+  size_t count = matches.size();
+  size_t index = rand() % count; // Randomly select one match
+  for (size_t i = 0; i < index; ++i) {
+    matches.pop(); // Pop until we reach the randomly selected index
+  }
+  std::string match = *matches.front(); // Get the front element
+  matches.pop(); // Remove it from the queue
+  return match;
 }
 
 /* #### Please don't remove this line! #### */
